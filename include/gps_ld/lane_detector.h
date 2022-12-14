@@ -1,55 +1,60 @@
 
-#ifndef DETECTOR_H_
-#define DETECTOR_H_
+#ifndef LANEDETECTOR_H_
+#define LANEDETECTOR_H_
 
 #include <ros/ros.h>
 #include <novatel_gps_msgs/NovatelPosition.h>
 #include <novatel_gps_msgs/Inspva.h>
 #include <sensor_msgs/Imu.h>
 #include <opencv2/highgui.hpp>
-
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
-#include <fstream>
-#include <chrono>
-#include "aggies_lib/aggies_util.h"
-#include "aggies_lib/aggies_param.h"
+// #include <fstream>
+// #include <chrono>
 #include "lanemarking_extractor.h"
+#include "helpers.h"
 
-class Detector{    
+class LaneDetector{    
     public:          
         /// @brief 
-        Detector();
+        LaneDetector();
         /// @brief 
-        ~Detector();
+        ~LaneDetector();
         /// @brief 
         /// @param img_msg 
         void image_callback(const sensor_msgs::CompressedImageConstPtr& img_msg);
+
         /// @brief 
         /// @param imu 
         void imu_callback(const sensor_msgs::Imu::ConstPtr& imu);
+
         /// @brief 
         /// @param msg 
         void gps_callback2(const novatel_gps_msgs::Inspva msg);
+
         /// @brief 
         /// @param msg 
         void gps_callback(const novatel_gps_msgs::NovatelPosition msg);
 
         /// @brief 
         void update_lane();
+
         /// @brief 
         /// @param pts 
         /// @param x 
         /// @param y 
-        void gps_to_image_coordinate(std::vector<ExtendedWaypoint>&pts,std::vector<int>& x,std::vector<int> &y);
+        void gps_to_image_coordinate(std::vector<GpsPt>&pts,std::vector<int>& x,std::vector<int> &y);
+
         /// @brief 
         /// @param img 
         void plot_to_image(cv::Mat &img);
+
         /// @brief 
         void calculate_index();
+
         /// @brief 
         /// @param pts 
-        void interpolate_points(std::vector<ExtendedWaypoint> &pts);
+        void interpolate_points(std::vector<GpsPt> &pts);
 
     private:
         // ROS node handle and image transport objects
@@ -74,7 +79,6 @@ class Detector{
         ///
         bool initialized_;
                
-        
         /// @brief 
         void initialize_params();   
 
@@ -90,4 +94,4 @@ class Detector{
         /// @brief
         void get_pixels(const Eigen::Vector3d &ref,std::vector<cv::Point> &pix_out);
 };
-#endif //DETECTOR_H_
+#endif //LANEDETECTOR_H_

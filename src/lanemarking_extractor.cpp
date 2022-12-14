@@ -1,12 +1,9 @@
 
 #include "lanemarking_extractor.h"
 
-LaneMarkingExtractor::LaneMarkingExtractor(){
-    
-}
-LaneMarkingExtractor::~LaneMarkingExtractor(){
+LaneMarkingExtractor::LaneMarkingExtractor(){ }
 
-}
+LaneMarkingExtractor::~LaneMarkingExtractor(){ }
 
 void LaneMarkingExtractor::get_pixels(std::vector<cv::Point2i> &pix_loc){    
     pix_loc = f_indices_;
@@ -17,24 +14,19 @@ void LaneMarkingExtractor::set_params(const cv::Mat &trans_mtx,const cv::Mat &ga
     gabor_kernel_ = gab_mtx;
 }
 
-void LaneMarkingExtractor::filter_image(cv::Mat &img_wrp,cv::Mat &img_out){
+void LaneMarkingExtractor::filter_image(const cv::Mat &img_wrp,cv::Mat &img_out){
     img_warped_ = img_wrp;
     preprocess();
-    // img_out = img_gabor_;
     apply_image_filtering();
     img_out = img_out_;
 }
 
-void LaneMarkingExtractor::get_gauss_filtered(cv::Mat &gaus_kern,cv::Mat &img_gbr,cv::Mat &img_gau){
-    cv::filter2D(img_tmp_,img_gau,CV_8U,gaus_kern);
-    img_gbr = img_gabor_.clone();
-}
+// void LaneMarkingExtractor::get_gauss_filtered(cv::Mat &gaus_kern,cv::Mat &img_gbr,cv::Mat &img_gau){
+//     cv::filter2D(img_tmp_,img_gau,CV_8U,gaus_kern);
+//     img_gbr = img_gabor_.clone();
+// }
 
 void LaneMarkingExtractor::preprocess(){
-    //std::cout<<"img:"<<image_.dims<<",ch:"<<image_.channels()<<"\n";
-    //cv::Mat img_warped;
-    //cv::warpPerspective(image_, img_warped, trans_matrix_, image_.size());
-
     //convert image to YCrCb color space
     cv::Mat img_ycrcb;            
     cv::cvtColor(img_warped_,img_ycrcb,cv::COLOR_BGR2YCrCb);
@@ -44,9 +36,8 @@ void LaneMarkingExtractor::preprocess(){
     cv::split(img_ycrcb,channels);  
     cv::Mat img_gray = channels[0];// ConvertToGrayImage(img_warped);  
     cv::GaussianBlur(img_gray,img_gray,cv::Size(5,5),3);
-    //subtract_average_intensity2(img_gray);
     subtract_average_intensity(img_gray);
-    img_tmp_ = img_gray.clone();
+    // img_tmp_ = img_gray.clone();
     cv::Mat gabor_gray;
     cv::filter2D(img_gray,gabor_gray,CV_8U,gabor_kernel_);
 
@@ -56,18 +47,18 @@ void LaneMarkingExtractor::preprocess(){
     cv::filter2D(img_cb,img_cb,CV_8U,gabor_kernel_);        
 
     // //Combine the Cr channel with the grayscale image      
-    cv::addWeighted(img_cb, 1.0, gabor_gray, 1.0, 0.0, img_gabor_);
+    cv::addWeighted(img_cb, 0.5, gabor_gray, 0.5, 0.0, img_gabor_);
 
     //ApplyImageFiltering();//img_filtered_ will be available
 }
 
 void LaneMarkingExtractor::apply_image_filtering(){
     
-    zero_indices();
+    zero_indices(); //populates indices_ vector
     if(indices_.size()>1){ 
-        select_indices();
+        select_indices(); //updates m_indices_ vector
         if(m_indices_.size()>1){
-            final_indices();
+            final_indices(); //updates f_indices_ vector
             filter_image();
         }
     }
@@ -167,8 +158,7 @@ void LaneMarkingExtractor::final_indices(){
 void LaneMarkingExtractor::subtract_average_intensity(cv::Mat &img){
     int width = img.cols;
     int height = img.rows;
-
-    
+   
     int win_w = width;
     int win_h = 20;
     int r_start = height-1 - win_h;
