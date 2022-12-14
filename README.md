@@ -21,7 +21,7 @@ This ros package expects the following ROS topics
 > ``` git clone https://github.com/ACCESSLab/gps_ld.git ```  
 >``` catkin_make ```  
 
-#### Run the ros node
+#### Running the ROS node
 ``` rosrun gps_ld gps_ld ```  
 
 The implementation is tested on Ubuntu 18 with ROS Melodic and Ubuntu 20.04 with ROS Noetic
