@@ -23,7 +23,8 @@ This ros package expects the following ROS topics
 
 #### Running the ROS node
 ``` rosrun gps_ld gps_ld ```  
-
+> ##### The complete source code will be released soon. 
+  
 The implementation is tested on Ubuntu 18 with ROS Melodic and Ubuntu 20.04 with ROS Noetic
 * [OpenCV 4.x](https://opencv.org/)
 * [Novatel OEM7 driver](https://wiki.ros.org/novatel_oem7_driver)
